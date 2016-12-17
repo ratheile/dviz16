@@ -1,6 +1,8 @@
 from flask import Flask
 from flask import request
 
+import collections
+
 from multiprocessing import Pool
 
 import plotly.graph_objs as go
@@ -125,7 +127,7 @@ def task1():
     
     # Get the rating for each movie. For series, the average over all instances is computed
     # swiss_movies([moviename, year]), rating_list([moviename, year, rating, nr_votes])
-    
+    4
     
     #rating_per_swiss_movie=([movie, year, rating(average)])
     rating_per_swiss_movie = []
@@ -149,7 +151,6 @@ def task1():
     print("sorted rating per swiss movie, example tuple: ", sorted_rating_per_swiss_movie[15])
     
     
-    import collections
     # Get average (for swiss movies) per year
     lastmovie = []
     average_per_year = {}
