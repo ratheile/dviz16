@@ -179,9 +179,6 @@ for movie in sorted_rating_per_swiss_movie:
         x = x_data,
         y = none_list,
         name=movie[0]
- #       ,marker=dict(
-#            line=dict(
-#            width=50))
     )
 
     bar_list.append(trace)
@@ -222,23 +219,98 @@ py.iplot(fig, filename='t1')
 # Create an IMDb yearly movie count and genre plot --> movies per genre per year
 # genre_list(movie, year, genre)
 
+import itertools
+
 # ------------------------------------------- Genres -----------------------------------------------------------------
 filename = "genres.txt"
 with open(filename, "r", encoding="latin-1") as f:
     data = f.readlines()[383:2398020]
 
-# genre_list will contain all movies, their rating, and year. --> rating_list(moviename, year, rating)
+# genre_list will contain all movies, their rating, and year. --> genre_list(movie, year, genre)
 genre_list = []
 for line in data:
     tokens = line.split()
     genre = tokens[-1]
     mov_year = extract_movie_and_year(tokens, 0)
     mov_year.append(genre)
-    # append to the swiss_token list now the moviename and the year
+    # append to the swiss_token list now the moviename and the year  
     genre_list.append(mov_year)
 print(genre_list[9])
 
+# first sort genre_list by year
+#sorted_genre_list = sorted(genre_list, key=lambda x: x[1])
 
+# Get genres and their corresponding counts
+counter = 0
+total_counter = 0
+genre_dic = {}
+
+#create nested dictionary
+for year in range(1995, 2016):
+    genre_dic[year]= {}
+    
+for m in range(len(genre_list)):
+    # same year
+    if type(genre_list[m][1]) is int:
+        if genre_list[m][1] >= 1995 and genre_list[m][1] <= 2015:
+            if genre_list[m][2] in genre_dic[genre_list[m][1]]:
+                genre_dic[genre_list[m][1]][genre_list[m][2]] = genre_dic[genre_list[m][1]][genre_list[m][2]] + 1
+                total_counter = total_counter + 1
+            else:
+                genre_dic[genre_list[m][1]][genre_list[m][2]] = 1
+        
+# The x axis is going to be the years, we chose the range from 2000 until 2015
+x_data = []
+for x in range(1995,2016):
+    x_data.append(x)
+    
+all_genres = []
+# get list of all genres
+for year in range(1995,2016):
+    new_list = list(genre_dic[year].keys())
+    for item in new_list:
+        all_genres.append(item)
+    
+all_genres = list(set(all_genres))
+print(all_genres)
+    
+trace_list = []
+for genre in all_genres:
+    y_data = []
+    for year in range(1995,2016):
+        if genre in genre_dic[year]:
+            y_data.append(genre_dic[year][genre])
+        else:
+            y_data.append(0)
+            
+    trace1 = go.Scatter(
+    x=x_data,
+    y=y_data,
+    mode='lines',
+    line=dict(width=0.5),
+    fill='tonexty',
+    name = genre
+) 
+    trace_list.append(trace1)
+
+                    
+data = trace_list
+layout = go.Layout(
+    title='Movie Count from 1995 - 2015',
+    showlegend=True,
+    xaxis=dict(
+        type='category',
+        title="Year"
+    ),
+    yaxis=dict(
+        type='linear',
+        title = "Nr. of Movies",
+        range=[1, 50000]
+    )
+)
+
+fig = go.Figure(data=data, layout=layout)
+py.iplot(fig, filename='stacked-area-plot')
 
 
 
@@ -307,6 +379,46 @@ print(movie_length[9])
 
 ############################################## Task 4 ###############################################################
 # Movie ratings in rating_list, genre in genre_list()
+
+from collections import defaultdict
+import functools as ft
+import multiprocessing as mp
+
+genre_rating = defaultdict(list)
+
+print(len(genre_list))
+print(len(rating_list))
+
+
+def process_genre_rating():
+
+    for rating in rating_list:
+        for genre in genre_list:
+            if rating[0] == genre[0] and rating[1] == genre[1]:
+                genre_rating[genre[2]].append(rating[2])
+                break
+
+
+
+pool = mp.Pool()
+ratings_list = pool.map(process_genre_rating())
+
+
+genre__avg = {}
+for genre in all_genres:
+    genre_avg[genre] = 0
+
+
+# Calculate average of ratings per genre and store it in a dictionary: genre_avg{["genre":avg]}
+rating_sum = 0
+
+for key, value in genre_rating:
+    for rating in value:
+        rating_sum = rating_sum + rating
+        genre_avg[genre] = rating_sum / len(value)
+        rating_sum = 0
+
+print(genre_avg)
 
 
 
