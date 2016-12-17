@@ -380,6 +380,46 @@ print(movie_length[9])
 ############################################## Task 4 ###############################################################
 # Movie ratings in rating_list, genre in genre_list()
 
+from collections import defaultdict
+import functools as ft
+import multiprocessing as mp
+
+genre_rating = defaultdict(list)
+
+print(len(genre_list))
+print(len(rating_list))
+
+
+def process_genre_rating():
+
+    for rating in rating_list:
+        for genre in genre_list:
+            if rating[0] == genre[0] and rating[1] == genre[1]:
+                genre_rating[genre[2]].append(rating[2])
+                break
+
+
+
+pool = mp.Pool()
+ratings_list = pool.map(process_genre_rating())
+
+
+genre__avg = {}
+for genre in all_genres:
+    genre_avg[genre] = 0
+
+
+# Calculate average of ratings per genre and store it in a dictionary: genre_avg{["genre":avg]}
+rating_sum = 0
+
+for key, value in genre_rating:
+    for rating in value:
+        rating_sum = rating_sum + rating
+        genre_avg[genre] = rating_sum / len(value)
+        rating_sum = 0
+
+print(genre_avg)
+
 
 
 
