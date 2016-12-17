@@ -291,7 +291,7 @@ for line in data:
     movie_length.append(mov_year)
 print(movie_length[9])
 
-# Noch komisch... einigi film über 1000 min längi?! evtl. eifach ignoriere.... ^^
+# Noch komisch... einigi film ueber 1000 min laengi evtl. eifach ignoriere.... ^^
 
 
 # ---------------------------------- Rating / Nr. of Votes Per Movie ------------------------------------------------

@@ -1,4 +1,31 @@
-#content {
-	padding-left: 1em;
-	padding-right: 1em;
+#main {
+	margin-top: 76px;
+	padding-top: 1em;
+}
+
+body {
+	background-color: rgba(42, 79, 110, 1);
+}
+
+
+.control-unit {
+	width: 100%;
+	background-color: rgba(196, 216, 233, 1);
+	padding:0.25em;
+}
+
+.btn {
+	border: 1px;
+}
+
+
+.plot-container {
+		padding: 1em;
+
+}
+
+.plot {
+		min-height: 100px;
+		background-color:  white;
+		box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }

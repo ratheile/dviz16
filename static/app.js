@@ -1,30 +1,41 @@
 $(document).ready(function(){
-  $("#button").click(function(e){
-	e.preventDefault();
-	$.ajax({type: "GET",
-	  url: "/test",
-	  data: {},
-	  success:function(result){
-			$('#plot1').html(result);
-	  },
-	  error: function (xhr, ajaxOptions, thrownError) {
-			$('#status').html('Error, check parameters!: ' + xhr.status + ' ' + thrownError);
-		}
+
+	$("#button1").click(function(e){
+		e.preventDefault();
+		load('/test',{}, '#plot1');
+	});
+
+	$("#button2").click(function(e){
+		e.preventDefault();
+		load('/test',{}, '#plot2');
+	});
+
+	$("#button3").click(function(e){
+		e.preventDefault();
+		load('/test',{}, '#plot3');
+	});
+
+	$("#button4").click(function(e){
+		e.preventDefault();
+		load('/test',{}, '#plot4');
 	});
 
 
+	function load(url, data, parent){
+		$.ajax({type: "GET",
+		  url: url,
+		  data: data,
+		  success:function(result){
+				$(parent).html(result);
+		  },
+		  error: function (xhr, ajaxOptions, thrownError) {
+				$(parent).html('Error, check parameters!: ' + xhr.status + ' ' + thrownError);
+			}
+		});
+	}
 
-	$.ajax({type: "GET",
-	  url: "/test",
-	  data: {},
-	  success:function(result){
-			$('#plot2').html(result);
-	  },
-	  error: function (xhr, ajaxOptions, thrownError) {
-			$('#status').html('Error, check parameters!: ' + xhr.status + ' ' + thrownError);
-		}
-	});
-  });
+
+
 });
 
 

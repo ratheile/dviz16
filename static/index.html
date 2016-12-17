@@ -3,24 +3,79 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Exercise 5</title>
+	<link href="static/tether.min.css" rel="stylesheet">
 	<link href="static/bootstrap.min.css" rel="stylesheet">
 	<link href="static/app.css" rel="stylesheet">
 </head>
 
 <body>
 	<script src="static/jquery.min.js"></script>
+	<script src="static/tether.min.js"></script>
 	<script src="static/bootstrap.min.js"></script>
 	<script src="static/app.js"></script>
 
-	<div class="page-header">
-		<h1>Exercise 5 <small>Mariella Greutmann, Raffael Theiler 10-928-893</small></h1>
-	</div>
+    <nav class="navbar navbar-fixed-top navbar-dark bg-inverse">
+      <a class="navbar-brand" href="#">		
+      	<h1>Exercise 5 <small>Mariella Greutmann, Raffael Theiler 10-928-893</small></h1>
+      </a>
+      <ul class="nav navbar-nav">
 
-	<div id="content">
-		<button id="button" type="button" class="btn btn-default">Reload</button>
-		<div id="status"></div>
-		<div id="plot1"></div>
-		<div id="plot2"></div>
+      </ul>
+    </nav>
+
+	<div id="main" class="container-fluid">
+
+		<div class="row">
+					<div class="col-md-6 plot-container" >
+						<div class="plot">
+							<!-- plot control-->
+							<div class="control-unit">
+								<button id="button1" type="button" class="btn btn-secondary">Reload</button>
+							</div>
+
+							<!-- async loaded plot data-->
+							<div class="plotdata" id="plot1"></div>
+						</div>
+					</div>
+
+					<div class="col-md-6 plot-container" >
+						<div class="plot">
+							<!-- plot control-->
+							<div class="control-unit">
+								<button id="button2" type="button" class="btn btn-secondary">Reload</button>
+							</div>
+
+							<!-- async loaded plot data-->
+							<div class="plotdata" id="plot2"></div>
+						</div>
+					</div>
+
+					<div class="col-md-6 plot-container" >
+						<div class="plot">
+							<!-- plot control-->
+							<div class="control-unit">
+								<button id="button3" type="button" class="btn btn-secondary">Reload</button>
+							</div>
+
+							<!-- async loaded plot data-->
+							<div class="plotdata" id="plot3"></div>
+						</div>
+					</div>
+
+					<div class="col-md-6 plot-container" >
+						<div class="plot">
+							<!-- plot control-->
+							<div class="control-unit">
+								<button id="button4" type="button" class="btn btn-secondary">Reload</button>
+							</div>
+
+							<!-- async loaded plot data-->
+							<div class="plotdata" id="plot4"></div>
+						</div>
+					</div>
+		</div>>
+
+
 	</div>
 </body>
 </html>
