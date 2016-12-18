@@ -153,8 +153,8 @@ x3 = np_dwl[0,length/3*2:]
 y3 = np_dwl[2,length/3*2:]
 
 trace_low_votes =  go.Histogram2dContour(x=x1, y=y1, contours=go.Contours(coloring='heatmap'))
-trace_medium_votes =  go.Histogram2dContour(x=x2, y=y2, showscale=False)
-trace_mucho_votes =  go.Histogram2dContour(x=x3, y=y3, showscale=False)
+trace_medium_votes =  go.Histogram2dContour(x=x2, y=y2, contours=go.Contours(coloring='heatmap'), showscale=False)
+trace_mucho_votes =  go.Histogram2dContour(x=x3, y=y3, contours=go.Contours(coloring='heatmap'), showscale=False)
 
 fig = tools.make_subplots(rows=1, cols=3, subplot_titles=('Rating vs Length with low # Votes', 'Rating vs Length with medium # Votes',
                                                           'Rating vs Length with high # Votes'))
