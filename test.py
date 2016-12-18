@@ -156,13 +156,23 @@ trace_low_votes =  go.Histogram2dContour(x=x1, y=y1, contours=go.Contours(colori
 trace_medium_votes =  go.Histogram2dContour(x=x2, y=y2, contours=go.Contours(coloring='heatmap'))
 trace_mucho_votes =  go.Histogram2dContour(x=x3, y=y3, contours=go.Contours(coloring='heatmap'))
 
-
-fig = tools.make_subplots(rows=1, cols=3)
+fig = tools.make_subplots(rows=1, cols=3, subplot_titles=('Rating vs Length with low # Votes', 'Rating vs Length with medium # Votes',
+                                                          'Rating vs Length with high # Votes'))
 
 fig.append_trace(trace_low_votes, 1, 1)
 fig.append_trace(trace_medium_votes, 1, 2)
 fig.append_trace(trace_mucho_votes, 1, 3)
 
-fig['layout'].update(height=600, width=3*600, title='i <3 subplots')
+
+fig['layout']['xaxis1'].update(title='Rating')
+fig['layout']['yaxis1'].update(title='Movie Length')
+
+fig['layout']['xaxis2'].update(title='Rating')
+fig['layout']['yaxis2'].update(title='Movie Length')
+
+fig['layout']['xaxis3'].update(title='Rating')
+fig['layout']['yaxis3'].update(title='Movie Length')
+
+fig['layout'].update(height=600, width=3*600, title='Rating, Movie Length, Nr. Votes')
 
 offline.plot(fig, filename='t1')
