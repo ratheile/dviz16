@@ -119,7 +119,7 @@ for element in in_time_range_titles:
         except: print('Exception with: ', element, 'and: ', d[element[0]])
     
 #array title, year, rating, votes, time # data here is valid data because of the filter mechanism
-data_with_length= list(filter(lambda x:x[4] and x[4] > 0 and x[4] < 1000, in_time_range_titles))
+data_with_length= list(filter(lambda x:x[4] and x[4] > 0 and x[4] < 150, in_time_range_titles))
         
 pool.terminate()
 pool.join()
@@ -141,22 +141,28 @@ print("Starting plot {} {} {} {} {} {}".format(
       np.max(np_dwl[2,:]),
       ))
 
+length = len(np_dwl[0])
 
-x = np_dwl[0,:]
-y = np_dwl[2,:]
+x1 = np_dwl[0,:length/3]
+y1 = np_dwl[2,:length/3]
 
-data = [
-    go.Histogram2dContour(x=x, y=y, contours=go.Contours(coloring='heatmap')),
-    go.Scatter(x=x, y=y, mode='markers', marker=go.Marker(color='white', size=3, opacity=0.3))
-]
+x2 = np_dwl[0,length/3:length/3*2]
+y2 = np_dwl[2,length/3:length/3*2]
 
-layout = go.Layout(
-    title="Test",
-    autosize=False,
-    width=500,
-    height=500,
-    xaxis=dict(title="Testx"),
-    yaxis=dict(title="Testy")
-)
-fig = go.Figure(data=data, layout=layout)
+x3 = np_dwl[0,length/3*2:]
+y3 = np_dwl[2,length/3*2:]
+
+trace_low_votes =  go.Histogram2dContour(x=x1, y=y1, contours=go.Contours(coloring='heatmap'))
+trace_medium_votes =  go.Histogram2dContour(x=x2, y=y2, contours=go.Contours(coloring='heatmap'))
+trace_mucho_votes =  go.Histogram2dContour(x=x3, y=y3, contours=go.Contours(coloring='heatmap'))
+
+
+fig = tools.make_subplots(rows=1, cols=3)
+
+fig.append_trace(trace_low_votes, 1, 1)
+fig.append_trace(trace_medium_votes, 1, 2)
+fig.append_trace(trace_mucho_votes, 1, 3)
+
+fig['layout'].update(height=600, width=3*600, title='i <3 subplots')
+
 offline.plot(fig, filename='t1')

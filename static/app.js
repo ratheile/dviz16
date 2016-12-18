@@ -2,22 +2,22 @@ $(document).ready(function(){
 
 	$("#button1").click(function(e){
 		e.preventDefault();
-		load('/test',{}, '#plot1');
+		load('/task1',{}, '#plot1');
 	});
 
 	$("#button2").click(function(e){
 		e.preventDefault();
-		load('/test',{}, '#plot2');
+		load('/task2',{}, '#plot2');
 	});
 
 	$("#button3").click(function(e){
 		e.preventDefault();
-		load('/test',{}, '#plot3');
+		load('/task3',{}, '#plot3');
 	});
 
 	$("#button4").click(function(e){
 		e.preventDefault();
-		$.getJSON("static/genreavgs.json", function(json) {
+		$.getJSON("/task4", function(json) {
 
    			var keys = [];
    			var values = []
@@ -33,11 +33,11 @@ $(document).ready(function(){
 			var count = keys.length;
 			var pi = Math.PI;
 
-			var plot_size = 600;
+			var plot_size = 700;
 			var radius = 100
 
-			var min_font_px = 15;
-			var max_font_px = 60;
+			var min_font_px = 10;
+			var max_font_px = 50;
 
 			var svg = d3.select("#plot4").append("svg")
 			                             .attr("width", plot_size)
@@ -63,9 +63,6 @@ $(document).ready(function(){
 					+ plot_size/2 + ")");
 
 			}
-
-	
-
 		});
 	});
 

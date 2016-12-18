@@ -1,16 +1,18 @@
 from flask import Flask
-from flask import request
+#from flask import request
 
 import collections
 
-from multiprocessing import Pool
+import json
+
+import multiprocessing as mp
 
 import plotly.graph_objs as go
 import plotly.offline as offline
 from plotly import tools
 import numpy as np
 
-import pandas as pd
+#import pandas as pd
 
 
 ############################################# Helper ################################################################
@@ -43,21 +45,96 @@ def extract_movie_and_year(tokens, start):
     return [moviename, year]
 
 
+#returns [name, year, rating, votes, length]
+def processRatingsLine(line): 
+    tokens = line.split()
+    rating = tokens[2]
+    nr_votes = tokens[1]
+    mov_year = extract_movie_and_year(tokens,3)
+    mov_year.append(float(rating))
+    mov_year.append(int(nr_votes))
+    mov_year.append(-1)
+    return mov_year 
+    
+    
+    
+def processMovieLength(line):
+    length = None
+    tokens = line.split()
+    if containsdigit(tokens[-1]) == True:
+        if tokens[-1].isdigit() == False:
+            length = extractnr(tokens[-1])
+        else:
+            length = tokens[-1]
+    else:
+        if containsdigit(tokens[-2]) == True:
+            if tokens[-2].isdigit() == False:
+                length = extractnr(tokens[-2])
+            else:
+                length = tokens[-2]
+        else:
+            if containsdigit(tokens[-3]) == True:
+                if containsdigit(tokens[-3]) == True:
+                    length = extractnr(tokens[-3])
+                else:
+                    length = tokens[-3]
+            else:
+                if containsdigit(tokens[-4]) == True:
+                    if containsdigit(tokens[-4]) == True:
+                        length = extractnr(tokens[-4])
+                    else:
+                        length = tokens[-4]
+                else:
+                    length = tokens[-4]
+    mov_year = extract_movie_and_year(tokens, 0)
+    mov_year.append(length)
+    return mov_year
+    
+    
+    
+    
+    #returns [name, year, rating, votes, length]
+def processRatingsLineT4(line): 
+    tokens = line.split()
+    rating = tokens[2]
+    nr_votes = tokens[1]
+    mov_year = extract_movie_and_year(tokens,3)
+    mov_year.append(float(rating))
+    mov_year.append(int(nr_votes))
+    mov_year.append(-1)
+    return [(mov_year[0], mov_year[1]), rating]
+    
+    
+def processGenres(line):
+    tokens = line.split()
+    genre = tokens[-1]
+    mov_year = extract_movie_and_year(tokens, 0)
+    mov_year.append(genre)
+    return [(mov_year[0], mov_year[1]), genre, -0.1]
+
 ############################################# Load Data ################################################################
 
 #countries
-
 
 filename = "countries.txt"
 with open(filename, "r", encoding="latin-1") as f:
     countries = f.readlines()[14:]
 print("read file countries.txt")
 
-
 filename = "ratings.txt"
 with open(filename, "r", encoding="latin-1") as f:
     ratings = f.readlines()[297:695711]
 print("read file ratings.txt")
+
+filename = "running-times.txt"
+with open(filename, "r", encoding="latin-1") as f:
+    running_times = f.readlines()[14:1347506]
+print("read file: running-times.txt")
+
+filename = "genres.txt"
+with open(filename, "r", encoding="latin-1") as f:
+    genres = f.readlines()[385:2397982]
+print("read file: genres.txt")
 
 
 ############################################# Start Server ################################################################
@@ -124,10 +201,11 @@ def task1():
             pass
     
     print("unique swiss movies created ", unique_swiss_movies[15])
-    
+    #returns [name, year, rating, votes, length]
+
     # Get the rating for each movie. For series, the average over all instances is computed
     # swiss_movies([moviename, year]), rating_list([moviename, year, rating, nr_votes])
-    4
+    
     
     #rating_per_swiss_movie=([movie, year, rating(average)])
     rating_per_swiss_movie = []
@@ -152,7 +230,6 @@ def task1():
     
     
     # Get average (for swiss movies) per year
-    lastmovie = []
     average_per_year = {}
     counter = 0
     sum_year = 0
@@ -232,16 +309,226 @@ def task1():
     div = offline.plot(fig,  output_type="div")
     return div;   
     
+   
+############################################# TASK 2 #################################################################
+# Create an IMDb yearly movie count and genre plot --> movies per genre per year
+# genre_list(movie, year, genre)
+    
+@app.route('/task2') 
+def task2():  
+    # genre_list will contain all movies, their rating, and year. --> genre_list(movie, year, genre)
+    genre_list = []
+    for line in genres:
+        tokens = line.split()
+        genre = tokens[-1]
+        mov_year = extract_movie_and_year(tokens, 0)
+        mov_year.append(genre)
+        # append to the swiss_token list now the moviename and the year  
+        genre_list.append(mov_year)
+    print(genre_list[9])
+    
+    # first sort genre_list by year
+    #sorted_genre_list = sorted(genre_list, key=lambda x: x[1])
+    
+    # Get genres and their corresponding counts
+    total_counter = 0
+    genre_dic = {}
+    
+    #create nested dictionary
+    for year in range(1995, 2016):
+        genre_dic[year]= {}
+        
+    for m in range(len(genre_list)):
+        # same year
+        if type(genre_list[m][1]) is int:
+            if genre_list[m][1] >= 1995 and genre_list[m][1] <= 2015:
+                if genre_list[m][2] in genre_dic[genre_list[m][1]]:
+                    genre_dic[genre_list[m][1]][genre_list[m][2]] = genre_dic[genre_list[m][1]][genre_list[m][2]] + 1
+                    total_counter = total_counter + 1
+                else:
+                    genre_dic[genre_list[m][1]][genre_list[m][2]] = 1
+            
+    # The x axis is going to be the years, we chose the range from 2000 until 2015
+    x_data = []
+    for x in range(1995,2016):
+        x_data.append(x)
+        
+    all_genres = []
+    # get list of all genres
+    for year in range(1995,2016):
+        new_list = list(genre_dic[year].keys())
+        for item in new_list:
+            all_genres.append(item)
+        
+    all_genres = list(set(all_genres))
+    print(all_genres)
+        
+    trace_list = []
+    for genre in all_genres:
+        y_data = []
+        for year in range(1995,2016):
+            if genre in genre_dic[year]:
+                y_data.append(genre_dic[year][genre])
+            else:
+                y_data.append(0)
+                
+        trace1 = go.Scatter(
+        x=x_data,
+        y=y_data,
+        mode='lines',
+        line=dict(width=0.5),
+        fill='tonexty',
+        name = genre
+    ) 
+        trace_list.append(trace1)
+    
+                        
+    data = trace_list
+    layout = go.Layout(
+        title='Movie Count from 1995 - 2015',
+        showlegend=True,
+        xaxis=dict(
+            type='category',
+            title="Year"
+        ),
+        yaxis=dict(
+            type='linear',
+            title = "Nr. of Movies",
+            range=[1, 50000]
+        )
+    )
+    
+    fig = go.Figure(data=data, layout=layout)
+    div = offline.plot(fig,  output_type="div")
+    return div;   
+
+
     
     
     
     
     
     
+############################################# TASK 3 #################################################################
+# Create a plot presenting the duration of movies over IMDb score, including also information about the number of
+# votes per movie --> movie length, rating, nr. of votes per movie
+
+# ----------------------------------------- Movie Length ---------------------------------------------------------
+@app.route('/task3') 
+def task3():    
+
+    pool = mp.Pool()
+
+    #array title, year, rating, votes, dummy value -1 for length
+    ratings_list = pool.map(processRatingsLine, ratings)
+    print("rating list created: ", len(ratings_list))
+    
+    in_time_range_titles = list(filter(lambda x:x[1] and x[1] >= 2000 and x[1] >= 2010, ratings_list))
+    print("rating list in time created: ", len(in_time_range_titles))
+    
+    #array title, year, length
+    length_list = pool.map(processMovieLength, running_times)
+    print("length list created: ", len(length_list))
+    
+    in_time_range_lengths = list(filter(lambda x:x[1] and x[1] >= 2000 and x[1] >= 2010, length_list))
+    print("rating list in time created: ", len(in_time_range_lengths))
     
     
+    #create a dict (name, duration) from [name, year, duration] Nx3 array
+    d = dict(np.array(in_time_range_lengths)[:,[0,2]])
+    for element in in_time_range_titles:
+        if element[0] in d:
+            try: 
+                element[2] = float(element[2]) #check that entry is numeric
+                element[3] = float(element[3]) #check that entry is numeric
+                element[4] = float(d[element[0]]) #check that entry is numeric
+            except: print('Exception with: ', element, 'and: ', d[element[0]])
+        
+    #array title, year, rating, votes, time # data here is valid data because of the filter mechanism
+    data_with_length= list(filter(lambda x:x[4] and x[4] > 0 and x[4] < 150, in_time_range_titles))
+            
+    pool.terminate()
+    pool.join()
+    
+    np_dwl = np.array(data_with_length) #convert to np array
+    
+    #row: ratings, votes, time
+    np_dwl = np.array([np_dwl[:,2],np_dwl[:,3], np_dwl[:,4]], dtype='float') 
+    
+    print("Starting plot {} {} {} {} {} {}".format( 
+          np.min(np_dwl[0,:]), 
+          np.max(np_dwl[0,:]),
+          np.min(np_dwl[1,:]),
+          np.max(np_dwl[1,:]),
+          np.min(np_dwl[2,:]),
+          np.max(np_dwl[2,:]),
+          ))
+    
+    length = len(np_dwl[0])
+    
+    x1 = np_dwl[0,:length/3]
+    y1 = np_dwl[2,:length/3]
+    
+    x2 = np_dwl[0,length/3:length/3*2]
+    y2 = np_dwl[2,length/3:length/3*2]
+    
+    x3 = np_dwl[0,length/3*2:]
+    y3 = np_dwl[2,length/3*2:]
+    
+    trace_low_votes =  go.Histogram2dContour(x=x1, y=y1, contours=go.Contours(coloring='heatmap'))
+    trace_medium_votes =  go.Histogram2dContour(x=x2, y=y2, contours=go.Contours(coloring='heatmap'))
+    trace_mucho_votes =  go.Histogram2dContour(x=x3, y=y3, contours=go.Contours(coloring='heatmap'))
     
     
+    fig = tools.make_subplots(rows=1, cols=3)
+    
+    fig.append_trace(trace_low_votes, 1, 1)
+    fig.append_trace(trace_medium_votes, 1, 2)
+    fig.append_trace(trace_mucho_votes, 1, 3)
+    
+    fig['layout'].update(height=600, width=3*600, title='i <3 subplots')
+ 
+    div = offline.plot(fig,  output_type="div")
+    return div;
+    
+    
+ ############################################# TASK 3 ################################################################
+@app.route('/task4') 
+def task4():       
+    pool = mp.Pool()
+    ratings_list = pool.map(processRatingsLineT4, ratings)
+    print("rating list created: ", len(ratings_list))
+    
+    
+    genres_list = pool.map(processGenres, genres)
+    print("genres list created: ", len(genres_list))
+    
+    rating_d = dict(ratings_list)
+    
+    for genre_entry in genres_list:
+        if genre_entry[0] in rating_d:
+            genre_entry[2] = float(rating_d[genre_entry[0]]) 
+    
+    pool.terminate()
+    pool.join()
+    
+    data_with_rating= list(filter(lambda x:x[2] and x[2] > 0, genres_list))
+    
+    np_genres = np.array(data_with_rating)
+    
+    uni_gen = np.unique(np_genres[:,[1]])
+    
+    genre_avgs = {}
+    for gen in uni_gen:    
+        subset = list(filter(lambda x: x[1] == gen, np_genres))
+        count = 0
+        scores = 0.0
+        for movie in subset:
+            count = count+1
+            scores = scores + movie[2]
+        genre_avgs[gen] = scores / count
+        
+    return json.dumps(genre_avgs)
     
     
 @app.route('/test')

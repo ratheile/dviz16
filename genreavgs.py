@@ -37,7 +37,7 @@ def extract_movie_and_year(tokens, start):
 
 
 #returns [name, year, rating, votes, length]
-def processRatingsLine(line): 
+def processRatingsLineT4(line): 
     tokens = line.split()
     rating = tokens[2]
     nr_votes = tokens[1]
@@ -66,7 +66,7 @@ with open(filename, "r", encoding="latin-1") as f:
 print("read file: running-times.txt")
 
 pool = mp.Pool()
-ratings_list = pool.map(processRatingsLine, ratings)
+ratings_list = pool.map(processRatingsLineT4, ratings)
 print("rating list created: ", len(ratings_list))
 
 
