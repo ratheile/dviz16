@@ -92,13 +92,15 @@ with open(filename, "r", encoding="latin-1") as f:
 print("read file: running-times.txt")
 
 pool = mp.Pool()
+
+#array title, year, rating, votes, dummy value -1 for length
 ratings_list = pool.map(processRatingsLine, ratings)
 print("rating list created: ", len(ratings_list))
 
 in_time_range_titles = list(filter(lambda x:x[1] and x[1] >= 2000 and x[1] >= 2010, ratings_list))
 print("rating list in time created: ", len(in_time_range_titles))
 
-pool = mp.Pool()
+#array title, year, length
 length_list = pool.map(processMovieLength, running_times)
 print("length list created: ", len(length_list))
 
@@ -115,20 +117,33 @@ for element in in_time_range_titles:
             element[3] = float(element[3]) #check that entry is numeric
             element[4] = float(d[element[0]]) #check that entry is numeric
         except: print('Exception with: ', element, 'and: ', d[element[0]])
-        
-data_with_length= list(filter(lambda x:x[4] and x[4] > 0, in_time_range_titles))
+    
+#array title, year, rating, votes, time # data here is valid data because of the filter mechanism
+data_with_length= list(filter(lambda x:x[4] and x[4] > 0 and x[4] < 1000, in_time_range_titles))
         
 pool.terminate()
 pool.join()
 
-np_dwl = np.array(data_with_length)
-np_dwl = np.array([np_dwl[:,2],np_dwl[:,3], np_dwl[:,4]], dtype='float')
+np_dwl = np.array(data_with_length) #convert to np array
 
-print("Starting plot, max[3]={}, min[3]={}", np.max(np_dwl[:,3]), np.max(np_dwl[:,3]))
+#row: ratings, votes, time
+np_dwl = np.array([np_dwl[:,2],np_dwl[:,3], np_dwl[:,4]], dtype='float') 
 
 
-x = np_dwl[:,1]
-y = np_dwl[:,2]
+
+
+print("Starting plot {} {} {} {} {} {}".format( 
+      np.min(np_dwl[0,:]), 
+      np.max(np_dwl[0,:]),
+      np.min(np_dwl[1,:]),
+      np.max(np_dwl[1,:]),
+      np.min(np_dwl[2,:]),
+      np.max(np_dwl[2,:]),
+      ))
+
+
+x = np_dwl[0,:]
+y = np_dwl[2,:]
 
 data = [
     go.Histogram2dContour(x=x, y=y, contours=go.Contours(coloring='heatmap')),

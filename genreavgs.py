@@ -69,7 +69,7 @@ pool = mp.Pool()
 ratings_list = pool.map(processRatingsLine, ratings)
 print("rating list created: ", len(ratings_list))
 
-pool = mp.Pool()
+
 genres_list = pool.map(processGenres, genres)
 print("genres list created: ", len(genres_list))
 
